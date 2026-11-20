@@ -4,6 +4,9 @@
 
   var DATA = { shelves: [], entries: [] };
   var view = document.getElementById('view');
+  /* real page per topic (SEO): the page says which route it shows when the address has no #hash */
+  var ROUTE0 = document.body.getAttribute('data-route') || '';
+  function curHash() { return location.hash.replace(/^#/, '') || ROUTE0; }
   var topTrack = document.getElementById('shelfTrack');
   var subnav = document.getElementById('subnav');
   var subTrack = document.getElementById('subTrack');
@@ -81,7 +84,7 @@
     var AB = { Instagram: 'IG', YouTube: 'YT', LinkedIn: 'IN', TikTok: 'TT', X: 'X' };
     return socialsOn().map(function (x) {
       return '<a class="soc" href="' + x[1] + '" target="_blank" rel="noopener" title="' + x[0] + '" aria-label="' + x[0] + ' (opens in a new tab)">' +
-        '<span class="ab">' + (AB[x[0]] || x[0]) + '</span><span class="full">' + x[0] + '</span><span class="arr" aria-hidden="true">&#8599;</span></a>';
+        '<span class="ab">' + (AB[x[0]] || x[0]) + '</span><span class="full">' + x[0] + '</span></a>';
     }).join('');
   }
   document.getElementById('footSocial').innerHTML = socialHtml();
@@ -182,7 +185,8 @@
   function entryById(id) { return DATA.entries.filter(function (e) { return e.id === id; })[0]; }
   function slots(n) { var h = ''; for (var i = 0; i < n; i++) h += '<div class="slot"></div>'; return '<div class="slots">' + h + '</div>'; }
   function pic(name, alt, eager) {
-    return '<img src="media/' + name + '-1500.jpg" srcset="media/' + name + '-750.jpg 750w, media/' + name + '-1500.jpg 1500w" sizes="(max-width:900px) 100vw, 1200px" alt="' + esc(alt) + '" width="1500" height="858"' + (eager ? ' fetchpriority="high"' : '') + '>';
+    return '<picture><source type="image/webp" srcset="media/' + name + '-750.webp 750w, media/' + name + '-1500.webp 1500w" sizes="(max-width:900px) 100vw, 1200px">' +
+      '<img src="media/' + name + '-1500.jpg" srcset="media/' + name + '-750.jpg 750w, media/' + name + '-1500.jpg 1500w" sizes="(max-width:900px) 100vw, 1200px" alt="' + esc(alt) + '" width="1500" height="858"' + (eager ? ' fetchpriority="high"' : ' loading="lazy"') + ' decoding="async"></picture>';
   }
   function scrollToEl(el, smooth) {
     if (!el) return;
@@ -211,6 +215,8 @@
   /* ---------- top menu: the 12 sections ---------- */
   function buildTopNav() {
     topTrack.style.setProperty('--n', DATA.shelves.length);
+    var secM = document.getElementById('navSecM');
+    if (secM) secM.innerHTML = DATA.shelves.map(function (s) { return '<a href="' + secHash(s) + '"><span class="n">' + s.id + '</span>' + esc(s.short || s.title) + '</a>'; }).join('');
     topTrack.innerHTML = DATA.shelves.map(function (s) {
       return '<button class="chip" data-sec="' + s.id + '" aria-expanded="false" title="' + esc(s.title) + '" aria-label="' + esc(s.id + ' ' + s.title) + '"><span class="n">' + s.id + '</span><span class="l">' + esc(s.short || s.title) + '</span></button>';
     }).join('');
@@ -264,7 +270,7 @@
     });
   }
   function currentSec() {
-    var h = location.hash.replace(/^#/, '');
+    var h = curHash();
     var m = h.match(/^(\d\d)-\d+$/);
     if (m) return m[1];
     var s = DATA.shelves.filter(function (x) { return h === x.slug || h.indexOf(x.slug + '-') === 0; })[0];
@@ -360,7 +366,7 @@
     view.innerHTML =
       '<section class="hero">' +
         '<h1 class="sr">IRA X LAB · Laboratory of the Mind</h1>' +
-        '<figure>' + pic('hall-far', 'Room of aluminum cases with the bronze IRA X LAB counter', true).replace('1200px', '100vw') + '</figure>' +
+        '<figure>' + pic('hall-far', 'Room of aluminum cases with the bronze IRA X LAB counter', true).replace(/1200px/g, '100vw') + '</figure>' +
       '</section>' +
       giveHtml('home') + '<div class="wrap">' +
         '<section class="section" id="lab">' + head('', 'The Lab') +
@@ -406,7 +412,7 @@
       '<div class="etiles">' + s.study.map(function (c) {
         var used = list.filter(function (e) { return e.source && e.source.url === c.url; }).map(num);
         return '<a class="etile study' + (used.length ? ' key' : '') + '" href="' + esc(safeUrl(c.url)) + '" target="_blank" rel="noopener">' + caseSvg(used.length ? 'b' : 's') +
-          '<span class="n">MIT ' + esc(c.code) + ' &#8599;</span><b>' + esc(c.title) + '</b><span class="w">' + esc(c.focus) + '</span>' +
+          '<span class="n">MIT ' + esc(c.code) + '</span><b>' + esc(c.title) + '</b><span class="w">' + esc(c.focus) + '</span>' +
           '<span class="used">' + (used.length ? 'In topics ' + used.join(' · ') : 'Next to study') + '</span></a>';
       }).join('') + '</div></section>';
   }
@@ -457,12 +463,13 @@
     view.innerHTML =
       '<section class="sec-hero ch-hero"><canvas class="sec-fx" aria-hidden="true"></canvas><div class="sec-shade"></div>' +
         '<div class="wrap sec-hero-in"><div class="sec-hero-text">' +
-          '<a class="label ch-back" href="' + secHash(s, ser ? ser.id : '') + '">' + s.id + ' ' + esc(s.title) + (ser ? ' · ' + esc(ser.title) : '') + ' · Part ' + pnum(g) + ' of ' + gs.length + '</a>' +
+          '<a class="back-btn" href="' + secHash(s, ser ? ser.id : '') + '"><span class="ar" aria-hidden="true">&#8249;</span>Back to ' + esc(ser ? ser.title : s.title) + '</a>' +
+          '<span class="label">' + s.id + ' ' + esc(s.title) + (ser ? ' · ' + esc(ser.title) : '') + ' · Part ' + pnum(g) + ' of ' + gs.length + '</span>' +
           '<h1>' + esc(g.title) + '</h1><p>' + esc(g.line || '') + '</p>' +
           '<p class="count">' + (items.length ? items.length + (items.length === 1 ? ' topic · ' : ' topics · ') + d + ' / ' + items.length + ' done' : 'Coming soon') + '</p>' +
         '</div></div></section>' +
       '<div class="wrap">' + partsNav(s, n, all) +
-        '<section class="section ch-list">' + head('Part ' + pnum(g), 'Topics') +
+        '<section class="section ch-list">' + 
           '<div class="etiles">' + items.map(function (e) { return tile(e, firstOpen ? firstOpen.id : ''); }).concat(planOf(s, n).map(planTile))
             .sort(function (a, b) { var x = +(a.match(/class="n">\d+\.(\d+)/) || [0, 0])[1], y = +(b.match(/class="n">\d+\.(\d+)/) || [0, 0])[1]; return x - y; }).join('') + '</div>' +
           (!items.length ? '<p class="ch-soon">The topics for this part are coming soon.</p>' : '') +
@@ -486,7 +493,7 @@
   function lessonTile(it, nextId) {
     var g = it.g, e = it.e;
     if (!e) return '<div class="etile plan" id="g' + g.n + '">' + caseSvg('s') + '<span class="n">' + it.n + ' · Coming soon</span><b>' + esc(g.title) + '</b><span class="w">' + esc(g.line) + '</span>' +
-      (SHOW_STUDY && g.url ? '<a class="mit" href="' + esc(safeUrl(g.url)) + '" target="_blank" rel="noopener">MIT source &#8599;</a>' : '') + '</div>';
+      (SHOW_STUDY && g.url ? '<a class="mit" href="' + esc(safeUrl(g.url)) + '" target="_blank" rel="noopener">MIT source</a>' : '') + '</div>';
     var done = isDone(e.id), nx = e.id === nextId;
     var label = done ? ' · Done &#10003;' : (nx ? ' · Next up' : (e.key ? ' · Start here' : ''));
     return '<a class="etile' + (e.key ? ' key' : '') + (done ? ' done' : '') + (nx ? ' next' : '') + '" id="g' + g.n + '" href="' + hashOf(e.id) + '">' + caseSvg(e.key || nx ? 'b' : 's') +
@@ -503,8 +510,9 @@
   }
   function videoHtml(e) {
     var id = ytId(e.video);
-    if (!id) return '<figure class="yt yt-empty" aria-label="Video coming soon"><div class="yt-box"><div class="yt-wait">' +
-      '<svg viewBox="0 0 64 64" width="64" height="64" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="none" stroke="#AA976C" stroke-width="2.5"/><path d="M26 20l20 12-20 12z" fill="#AA976C"/></svg>' +
+    if (!id) return '<figure class="yt yt-empty" aria-label="Video coming soon"><div class="yt-box">' +
+      '<video class="yt-loop" src="media/coming-soon.mp4" poster="media/coming-soon.jpg" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video>' +
+      '<div class="yt-wait"><svg viewBox="0 0 64 64" width="64" height="64" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="#FFFFFF" stroke="#AA976C" stroke-width="2.5"/><path d="M26 20l20 12-20 12z" fill="#AA976C"/></svg>' +
       '<span>Video coming soon</span></div></div></figure>';
     return '<figure class="yt"><div class="yt-box"><iframe src="https://www.youtube-nocookie.com/embed/' + id + '?rel=0" title="' + esc(e.title) + ' · video" loading="lazy" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div></figure>';
   }
@@ -523,14 +531,15 @@
     view.innerHTML =
       '<section class="sec-hero ch-hero"><canvas class="sec-fx" aria-hidden="true"></canvas><div class="sec-shade"></div>' +
         '<div class="wrap sec-hero-in"><div class="sec-hero-text">' +
-          '<a class="label ch-back" href="' + secHash(s) + '">&#8249; ' + s.id + ' ' + esc(s.title) + ' · Part ' + ser.n + ' of ' + seriesOf(s).length + '</a>' +
+          '<a class="back-btn" href="' + secHash(s) + '"><span class="ar" aria-hidden="true">&#8249;</span>Back to ' + esc(s.title) + '</a>' +
+          '<span class="label">' + s.id + ' ' + esc(s.title) + ' · Part ' + ser.n + ' of ' + seriesOf(s).length + '</span>' +
           '<h1>' + esc(ser.title) + '</h1><p>' + esc(ser.line) + '</p>' +
-          '<p class="count">' + items.length + ' topics · ' + (list.length === items.length ? 'all ready' : list.length + ' ready') + (d ? ' · ' + d + ' done' : '') + '</p>' +
+          '<p class="count">' + items.length + ' topics' + (d ? ' · ' + d + ' done' : '') + '</p>' +
         '</div></div></section>' +
       '<div class="wrap">' +
-        '<section class="section part-lessons">' + head('Part ' + ser.n, 'Topics') +
+        '<section class="section part-lessons">' + 
           '<div class="etiles">' + items.map(function (it) { return lessonTile(it, firstOpen ? firstOpen.e.id : ''); }).join('') + '</div>' +
-          (SHOW_STUDY && ser.url ? '<p class="study-line"><a href="' + esc(safeUrl(ser.url)) + '" target="_blank" rel="noopener">MIT source for this part &#8599;</a></p>' : '') +
+          (SHOW_STUDY && ser.url ? '<p class="study-line"><a href="' + esc(safeUrl(ser.url)) + '" target="_blank" rel="noopener">MIT source for this part</a></p>' : '') +
         '</section>' + partLinks(s, ser) +
       '</div>';
     setSubnav(seriesTabs(s, ser.id));
@@ -545,7 +554,7 @@
       return '<a class="ser-card" href="' + secHash(s, x.id) + '" style="--c:' + x.color + ';--ci:' + (x.ink || '#000') + '">' +
         '<div class="ser-band">' + caseSvg(x.n === 1 ? 'b' : 's') + '<span>Part ' + x.n + '</span><h3>' + (x.lines || [x.title]).map(esc).join('<br>') + '</h3></div>' +
         '<div class="ser-body"><p>' + esc(x.line) + '</p>' +
-        '<span class="ser-meta">' + partItems(s, x).length + ' topics · ' + (list.length === partItems(s, x).length ? 'all ready' : list.length + ' ready') + (d ? ' · ' + d + ' done' : '') + '</span>' +
+        '<span class="ser-meta">' + partItems(s, x).length + ' topics' + (d ? ' · ' + d + ' done' : '') + '</span>' +
         '<span class="ser-open">Open &#8250;</span></div></a>';
     }).join('') + '</div>';
   }
@@ -581,21 +590,21 @@
         return fg.series ? seriesPage(s, serById(s, fg.series), fg.n) : chapterPage(s, +focus);
       }
       if (seriesOf(s).length) {
-        intro = '<p class="count">' + seriesOf(s).length + ' parts · ' + seriesOf(s).reduce(function (t, x) { return t + partItems(s, x).length; }, 0) + ' topics · ' + list.length + ' ready</p>';
-        body = '<section class="section" id="overview">' + head('', 'Parts') + seriesCards(s) + '</section>';
+        intro = '<p class="count">' + seriesOf(s).length + ' parts · ' + list.length + ' topics</p>';
+        body = '<section class="section" id="overview">' + seriesCards(s) + '</section>';
         sub = seriesTabs(s, '');
       } else {
       intro = '<p class="count">' + list.length + ' topics · ' + groupsOf(s).length + ' parts</p>';
-      body = '<section class="section" id="overview">' + head('', 'Parts') + legend() + gtilesHtml(s, list, false) + '</section>' + studyHtml(s);
+      body = '<section class="section" id="overview">' + legend() + gtilesHtml(s, list, false) + '</section>' + studyHtml(s);
       sub = groupsOf(s).map(function (g) { return { href: secHash(s, g.n), n: String(g.n), label: g.short || g.title }; });
       if (SHOW_STUDY && s.study && s.study.length && sub.length < 9) sub.push({ id: 'courses', n: 'MIT', label: 'Courses' });
       }
     } else {
       body = list.length
-        ? '<section class="section" id="entries">' + head('', 'Topics') + '<div class="etiles">' + list.map(tile).join('') + '</div></section>'
+        ? '<section class="section" id="entries">' + '<div class="etiles">' + list.map(tile).join('') + '</div></section>'
         : '';
       body += studyHtml(s);
-      if (!body) body = '<section class="section" id="entries">' + head('', 'Topics') + slots(3) + '</section>';
+      if (!body) body = '<section class="section" id="entries">' + slots(3) + '</section>';
     }
 
     view.innerHTML =
@@ -612,7 +621,7 @@
       '</div>';
     setSubnav(sub);
     if (window.IRAXFX) IRAXFX.start(view.querySelector('.sec-fx'), s.id);
-    document.title = s.id + ' ' + s.title + ' · IRA X LAB';
+    document.title = s.title + ' · IRA X LAB';
     if (focus) {
       var target = document.getElementById(/^\d$/.test(focus) ? 'g' + focus : focus);
       setTimeout(function () { scrollToEl(target, false); }, 0);
@@ -705,7 +714,10 @@
       return '<section class="neuron">' + blockHead(b) + '<div class="neuron-stage">' + svg + '</div>' +
         '<ol class="neuron-list">' + b.items.map(function (x, k) { return '<li><span class="bob-n">' + (k + 1) + '</span><b>' + esc(x[0]) + '</b><p>' + esc(x[1]) + '</p></li>'; }).join('') + '</ol></section>';
     },
-    fun: function (b) { return '<div class="fun"><span class="k">Fun fact</span><p>' + esc(b.text) + '</p></div>'; }
+    read: function (b) {
+      return '<section class="read">' + blockHead(b) + '<div class="read-body">' + b.paras.map(function (t) { return '<p>' + esc(t) + '</p>'; }).join('') + '</div></section>';
+    },
+    fun: function (b) { return '<div class="fun"><span class="k">' + esc(b.k || 'Worth knowing') + '</span><p>' + esc(b.text) + '</p></div>'; }
   };
   function blocksHtml(e) {
     return (e.blocks || []).map(function (b, i) {
@@ -751,11 +763,12 @@
     }).join('');
     view.innerHTML =
       '<div class="wrap"><article class="entry">' +
+        '<a class="back-btn" href="' + secHash(s, ser ? ser.id : (g ? g.n : '')) + '"><span class="ar" aria-hidden="true">&#8249;</span>Back to ' + esc(ser ? ser.title : (g ? g.title : s.title)) + '</a>' +
         '<nav class="pn-top" aria-label="Previous and next lesson">' +
           (prev ? '<a class="pt-prev" href="' + hashOf(prev.id) + '"><span class="ar">&#8249;</span><span class="tx"><small>Previous</small>' + esc(lab(prev)) + esc(prev.title) + '</span></a>' : '<span></span>') +
           (next ? '<a class="pt-next pulse" href="' + hashOf(next.id) + '"><span class="tx"><small>Next</small>' + esc(lab(next)) + esc(next.title) + '</span><span class="ar">&#8250;</span></a>' : '<span></span>') +
         '</nav>' +
-        '<a class="crumb" href="' + secHash(s, g ? g.n : '') + '">&#8249; ' + s.id + ' ' + esc(s.title) + (ser ? ' · Part ' + ser.n + ' · ' + esc(ser.title) + ' · ' + esc(num(e)) : (g ? ' · Part ' + pnum(g) + ' · ' + esc(g.title) : '')) + '</a>' +
+        
         '<div class="head"><span class="n">' + esc(num(e)) + '</span><h1>' + esc(e.title) + '</h1>' +
           (e.kind ? '<span class="tag">' + esc(e.kind) + '</span>' : '') + '</div>' +
         '<div class="lead">' +
@@ -795,10 +808,10 @@
       copyText(num(e) + ' ' + e.title + '\n' + steps.map(function (st) {
         var p = st.p || 'D', pre = p !== lastP ? '\n' + PHASE[p].toUpperCase() + '\n' : ''; lastP = p;
         return pre + (++k) + '. ' + st.t;
-      }).join('\n') + '\n\n' + location.origin + location.pathname + hashOf(e.id));
+      }).join('\n') + '\n\n' + (e.url ? 'https://iraxlab.com' + e.url : location.origin + location.pathname + hashOf(e.id)));
     });
     setSubnav(ser ? seriesTabs(s, ser.id) : groupsOf(s).map(function (x) { return { href: secHash(s, x.n), n: String(x.n), label: x.short || x.title, on: x.n === e.group }; }));
-    document.title = e.id + ' ' + e.title + ' · IRA X LAB';
+    document.title = e.title + ' · ' + (ser ? ser.title : s.title) + ' · IRA X LAB';
   }
   function fact(k, v, cls) { return '<div class="fact' + (cls ? ' ' + cls : '') + '"><div class="k">' + k + '</div><div class="v">' + v + '</div></div>'; }
 
@@ -850,7 +863,7 @@
   function founderPage() {
     view.innerHTML =
       '<section class="fd-hero"><div class="wrap fd-hero-in">' +
-        '<figure class="fd-photo"><img src="media/irina-medelye.jpg" srcset="media/irina-medelye-600.jpg 600w, media/irina-medelye.jpg 1151w" sizes="(max-width:900px) 100vw, 560px" width="1151" height="1152" alt="Irina Medelye, creative founder of IRA X LAB"></figure>' +
+        '<figure class="fd-photo"><picture><source type="image/webp" srcset="media/irina-medelye-600.webp 600w, media/irina-medelye.webp 1151w" sizes="(max-width:900px) 100vw, 560px"><img src="media/irina-medelye.jpg" srcset="media/irina-medelye-600.jpg 600w, media/irina-medelye.jpg 1151w" sizes="(max-width:900px) 100vw, 560px" width="1151" height="1152" alt="Irina Medelye, creative founder of IRA X LAB" decoding="async"></picture></figure>' +
         '<div class="fd-id">' +
           '<span class="fd-label">The Founder</span>' +
           '<h1>Irina Medelye</h1>' +
@@ -985,13 +998,49 @@
     if (e.key === '/' && document.activeElement !== q && !/input|textarea/i.test(document.activeElement.tagName)) { e.preventDefault(); q.focus(); }
   });
 
+
+  /* ---------- share: every page, its real address (SEO pages) ---------- */
+  var SHARE_ICO = {
+    x: '<path d="M4 4l16 16M20 4L4 20" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>',
+    in: '<rect x="3" y="9" width="4" height="12" fill="currentColor"/><circle cx="5" cy="5" r="2.2" fill="currentColor"/><path d="M10 9h4v2c1-1.6 2.4-2.3 4.2-2.3 2.6 0 3.8 1.7 3.8 4.8V21h-4v-6.6c0-1.6-.6-2.4-1.9-2.4-1.4 0-2.1 1-2.1 2.6V21h-4z" fill="currentColor"/>',
+    fb: '<path d="M14 21v-8h3l.5-3.5H14V7.4c0-1 .3-1.7 1.8-1.7H18V2.6C17.6 2.5 16.5 2.4 15.2 2.4 12.5 2.4 10.6 4 10.6 7v2.5H7.6V13h3v8z" fill="currentColor"/>',
+    wa: '<path d="M12 3a9 9 0 0 0-7.7 13.6L3 21l4.5-1.2A9 9 0 1 0 12 3z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9 8.5c.3-.6.7-.6 1-.6l.6 1.5-.6.9c.5 1 1.3 1.8 2.3 2.3l.9-.6 1.5.6c0 .3 0 .7-.6 1-.7.4-1.7.3-3-.5a8 8 0 0 1-2.6-2.6c-.8-1.3-.9-2.3-.5-3z" fill="currentColor"/>',
+    em: '<rect x="3" y="5" width="18" height="14" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 6l9 7 9-7" fill="none" stroke="currentColor" stroke-width="1.8"/>',
+    ln: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>'
+  };
+  function shareIco(k) { return '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">' + SHARE_ICO[k] + '</svg>'; }
+  function addShare() {
+    var old = document.getElementById('shareBar'); if (old) old.remove();
+    var h = curHash();
+    var path = (DATA.urls || {})[h];
+    if (path == null) return;
+    var url = 'https://iraxlab.com' + path, t = document.title, u = encodeURIComponent(url), tt = encodeURIComponent(t);
+    var links = [
+      ['x', 'X', 'https://twitter.com/intent/tweet?url=' + u + '&text=' + tt],
+      ['in', 'LinkedIn', 'https://www.linkedin.com/sharing/share-offsite/?url=' + u],
+      ['fb', 'Facebook', 'https://www.facebook.com/sharer/sharer.php?u=' + u],
+      ['wa', 'WhatsApp', 'https://wa.me/?text=' + encodeURIComponent(t + ' ' + url)],
+      ['em', 'Email', 'mailto:?subject=' + tt + '&body=' + u]];
+    var box = document.createElement('section');
+    box.id = 'shareBar'; box.className = 'share wrap'; box.setAttribute('aria-label', 'Share this page');
+    box.innerHTML = '<span class="share-k">Share this page</span><div class="share-row">' +
+      links.map(function (l) { return '<a class="share-b" href="' + l[2] + '" target="_blank" rel="noopener" aria-label="Share on ' + l[1] + '">' + shareIco(l[0]) + '<span>' + l[1] + '</span></a>'; }).join('') +
+      '<button class="share-b" type="button" id="shareCopy" aria-label="Copy link for Instagram, TikTok or YouTube">' + shareIco('ln') + '<span>Copy link</span></button></div>' +
+      '<p class="share-note">For Instagram, TikTok and YouTube, copy the link and paste it into your bio, story or description.</p>';
+    view.appendChild(box);
+    document.getElementById('shareCopy').addEventListener('click', function () {
+      var b = this, done = function () { b.querySelector('span').textContent = 'Link copied'; setTimeout(function () { b.querySelector('span').textContent = 'Copy link'; }, 2000); };
+      if (navigator.share && /Mobi|Android|iPhone/i.test(navigator.userAgent)) { navigator.share({ title: t, url: url }).catch(function () {}); return; }
+      try { navigator.clipboard.writeText(url).then(done, function () { prompt('Copy this link', url); }); } catch (err) { prompt('Copy this link', url); }
+    });
+  }
   /* ---------- router ---------- */
   var HOME = { lab: 1, sections: 1, method: 1 };
   var PAGES = { about: aboutPage, founder: founderPage, offer: offerPage, contact: contactPage };
   function route() {
     if (window.IRAXFX) IRAXFX.stop();
     setAcc(null);
-    var h = location.hash.replace(/^#/, '');
+    var h = curHash();
     panel.hidden = true;
     var m, s;
     markSite(h);
@@ -1011,6 +1060,7 @@
     else if ((m = h.match(/^(.+)-(\d+|az|sources|terms|[a-z]+)$/)) && (s = secBySlug(m[1]))) { toTop(); sectionPage(s, m[2]); }
     else missing();
     markTop(currentSec(), false);
+    addShare();
   }
   window.addEventListener('hashchange', route);
 
