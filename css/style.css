@@ -7,7 +7,7 @@
 :root{
   --white:#FFFFFF; --black:#000000; --blue:#AABEC9; --silence:#D1DCE3;
   --stellar:#89929A; --platinum:#C0C0C0; --secret:#495464; --bronze:#AA976C;
-  --no:#660033;
+  --no:#BB182E;
   --font-title:"Inter",sans-serif;
   --font-text:"Titillium Web",sans-serif;
   --s1:9px; --s2:18px; --s3:27px; --s4:36px; --s6:54px; --s9:81px;
@@ -254,7 +254,7 @@ a.copy{text-decoration:none;display:inline-block}
 .toast{position:fixed;left:50%;bottom:var(--s4);transform:translateX(-50%);background:var(--black);color:var(--white);padding:var(--s1) var(--s3);border-left:4px solid var(--bronze);font-family:var(--font-title);font-size:13px;letter-spacing:.06em;z-index:80}
 
 /* ---------- Footer ---------- */
-.give{background:var(--bronze);color:var(--black);border-top:6px solid var(--black);border-bottom:6px solid var(--black)}
+.give{background:var(--bronze);color:var(--black);border:0}
 .give-foot{margin-top:var(--s9)}
 .give-home{margin:0;border-top:0}
 .give-in{display:flex;align-items:center;gap:var(--s4);padding-top:var(--s6);padding-bottom:var(--s6)}
@@ -265,11 +265,11 @@ a.copy{text-decoration:none;display:inline-block}
 .give p{color:var(--black);font-size:18px;max-width:640px}
 .give-btn{flex:0 0 auto;display:inline-block;background:var(--black);color:var(--white);font-family:var(--font-title);font-weight:700;font-size:17px;letter-spacing:.14em;text-transform:uppercase;text-decoration:none;padding:22px 45px;border:2px solid var(--black);animation:givePulse 2.7s ease-in-out infinite}
 .give-btn:hover,.give-btn:focus-visible{background:var(--white);color:var(--black);animation:none}
-@keyframes givePulse{0%,100%{box-shadow:0 0 0 0 rgba(0,0,0,.45)}50%{box-shadow:0 0 0 9px rgba(0,0,0,0)}}
+@keyframes givePulse{0%,100%{opacity:1}50%{opacity:.86}}
 .heart-fill{fill:var(--black);transform-box:view-box;transform-origin:50% 100%;animation:heartFill 4.5s ease-in-out infinite}
 @keyframes heartFill{0%{transform:translateY(100%)}45%,55%{transform:translateY(0)}100%{transform:translateY(100%)}}
 @media (prefers-reduced-motion:reduce){.give-btn{animation:none}.heart-fill{animation:none;transform:translateY(0)}}
-.entry .give{margin:var(--s6) 0;border:6px solid var(--black)}
+.entry .give{margin:var(--s6) 0;border:0}
 .entry .give .wrap{padding-left:var(--s3);padding-right:var(--s3)}
 .entry .give h2{font-size:26px}
 .entry .give-ico{width:54px;height:54px}
@@ -819,10 +819,10 @@ a.lb:hover{border-color:#000}
 }
 .yt-wait{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--s2);color:var(--white);font-family:var(--font-title);font-weight:700;font-size:13px;letter-spacing:.16em;text-transform:uppercase}
 .yt-empty .yt-box{border-color:var(--black)}
-/* hearts in burgundy (Irina, 2026-11-20) */
-.give-ico{color:#660033}
-.give-ico .heart-fill{fill:#660033}
-.ts-heart{color:#660033}
+/* hearts in red (Irina, 2026-11-20) */
+.give-ico{color:#BB182E}
+.give-ico .heart-fill{fill:#BB182E}
+.ts-heart{color:#BB182E}
 .top-strip:hover .ts-heart{color:#FFFFFF}
 
 /* ===== Full width + responsive v2 (Irina, 2026-11-20) =====
@@ -855,13 +855,85 @@ img,svg,video,iframe{max-width:100%}
   .flow-row span{font-size:11px;letter-spacing:.06em;padding-left:4px;padding-right:4px}
 }
 @media (max-width:420px){.case{grid-template-columns:64px minmax(0,1fr);gap:var(--s2);padding:var(--s2)}.case>*{min-width:0}.case h3,.case p{overflow-wrap:anywhere}}
-/* study music + sound buttons in burgundy (Irina, 2026-11-20) */
-.tune,.bell{border:1.5px solid #660033;color:#660033;background:var(--white)}
-.tune:hover,.bell:hover{background:#660033;border-color:#660033;color:var(--white)}
-.tune[aria-pressed="true"]{background:#660033;border-color:#660033;color:var(--white)}
-.bell[aria-pressed="false"]{color:#660033;border-color:#660033;opacity:.55}
+/* study music + sound buttons in red (Irina, 2026-11-20) */
+.tune,.bell{border:1.5px solid #BB182E;color:#BB182E;background:var(--white)}
+.tune:hover,.bell:hover{background:#BB182E;border-color:#BB182E;color:var(--white)}
+.tune[aria-pressed="true"]{background:#BB182E;border-color:#BB182E;color:var(--white)}
+.bell[aria-pressed="false"]{color:#BB182E;border-color:#BB182E;opacity:.55}
 .bell[aria-pressed="false"]:hover{opacity:1}
-/* v2: solid burgundy at rest, outline on hover (Irina, 2026-11-20) */
-.tune,.bell,.tune[aria-pressed="true"],.bell[aria-pressed="false"]{background:#660033;border:1.5px solid #660033;color:var(--white);opacity:1}
-.tune:hover,.bell:hover,.tune[aria-pressed="true"]:hover,.bell[aria-pressed="false"]:hover{background:var(--white);color:#660033;border-color:#660033}
+/* v2: solid red at rest, outline on hover (Irina, 2026-11-20) */
+.tune,.bell,.tune[aria-pressed="true"],.bell[aria-pressed="false"]{background:#BB182E;border:1.5px solid #BB182E;color:var(--white);opacity:1}
+.tune:hover,.bell:hover,.tune[aria-pressed="true"]:hover,.bell[aria-pressed="false"]:hover{background:var(--white);color:#BB182E;border-color:#BB182E}
 .bell[aria-pressed="false"]{opacity:.7}
+picture{display:block}
+/* video cover: looping palette clip until the real video is linked */
+.yt-empty .yt-box{background:#FFFFFF;border:1px solid var(--plat,#C0C0C0);overflow:hidden}
+.yt-loop{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.yt-empty .yt-wait{color:var(--secret,#495464);z-index:1}
+.yt-empty .yt-wait span{background:rgba(255,255,255,.85);padding:6px 12px}
+@media (prefers-reduced-motion:reduce){.yt-loop{display:none}.yt-empty .yt-box{background:#FFFFFF url(../media/coming-soon.jpg) center/cover}}
+/* less on the way: first section sits close under the hero */
+#overview,.part-lessons,.ch-list,#entries{padding-top:var(--s4)}
+/* phones: nothing in the way. Sections live in the Menu; no sticky bars, no crumb */
+@media (max-width:600px){
+  .sticky{display:none}
+  .crumb{display:none}
+  .top .site-nav .sn-secs{display:grid;grid-template-columns:1fr 1fr;gap:0;width:100%;border-top:1px solid var(--platinum);margin-top:var(--s2)}
+  .top .site-nav .sn-secs a{justify-content:flex-start;text-align:left;padding:12px 8px;border-bottom:1px solid var(--platinum);font-size:13px}
+  .top .site-nav .sn-secs .n{color:var(--bronze);margin-right:8px}
+  .hero-sec,.ch-hero{min-height:0}
+}
+@media (max-width:600px){.sec-hero{min-height:300px}.ch-hero{min-height:220px}}
+
+/* reading block: short paragraphs between the visual blocks */
+.read{margin:var(--s6) 0}
+.read-body{max-width:760px}
+.read-body p{font-family:var(--font-text,'Titillium Web',sans-serif);font-size:18px;line-height:1.7;color:var(--black);margin:0 0 var(--s3)}
+.read-body p:last-child{margin-bottom:0}
+.read-body p b{font-weight:700}
+@media (max-width:600px){.read-body p{font-size:17px;line-height:1.65}}
+/* footer: light top rule, clear space above the logo, socials always wrap (Irina, 2026-11-20) */
+.foot{border-top:1px solid var(--platinum,#C0C0C0)}
+.foot-in{padding-top:var(--s6);padding-bottom:var(--s6)}
+@media (max-width:900px){
+  .foot-in{padding-top:56px;padding-bottom:var(--s5);row-gap:28px}
+  .foot img{width:150px;height:auto}
+  .foot-soc{display:flex;flex-wrap:wrap;justify-content:center !important;gap:10px;max-width:100%}
+  .foot-soc a{flex:0 0 auto}
+}
+@media (max-width:420px){.foot-soc a{padding-left:12px !important;padding-right:12px !important;font-size:11px}}
+
+/* crawlable page text, shown until the app draws the page */
+.seo-static{padding-top:var(--s6);padding-bottom:var(--s6);max-width:820px}
+.seo-static h1{font-size:34px;margin-bottom:var(--s2)}
+.seo-static h2{font-size:20px;margin:var(--s4) 0 var(--s1)}
+.seo-static p,.seo-static li,.seo-static dd{font-size:17px;line-height:1.65}
+.seo-crumb{font-size:13px;margin-bottom:var(--s2)}
+
+/* share bar on every page (Irina, 2026-11-20) */
+.share{margin-top:var(--s6);margin-bottom:var(--s6);padding-top:var(--s4);border-top:1px solid var(--platinum,#C0C0C0);text-align:center}
+.share-k{display:block;font-family:var(--font-title);font-weight:700;font-size:13px;letter-spacing:.18em;text-transform:uppercase;margin-bottom:var(--s2)}
+.share-row{display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+.share-b{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 16px;border:1.5px solid var(--black);background:var(--white);color:var(--black);font-family:var(--font-title);font-weight:700;font-size:12px;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;cursor:pointer}
+.share-b:hover,.share-b:focus-visible{background:var(--black);color:var(--white)}
+.share-note{margin-top:var(--s2);font-size:14px;color:var(--secret,#495464)}
+/* menus: breathing room at both edges (Irina, 2026-11-20) */
+.shelfnav .track,.subnav .track{padding-left:clamp(16px,4vw,72px) !important;padding-right:clamp(16px,4vw,72px) !important;box-sizing:border-box}
+@media (max-width:600px){.top .site-nav{padding-left:16px !important;padding-right:16px !important;box-sizing:border-box}.share-b{padding:0 12px}}
+
+/* hearts: one red SVG everywhere, no emoji; no arrows on buttons (Irina, 2026-11-20) */
+.ts-heart{display:inline-block;width:18px;height:18px;vertical-align:-3px;color:#BB182E;flex:none}
+.ts-heart path{fill:currentColor}
+.soc .arr{display:none}
+.give-ico .heart-fill{animation:none;transform:none}
+.give-ico{animation:hbeat 1.6s ease-in-out infinite;transform-origin:50% 60%}
+@media (prefers-reduced-motion:reduce){.give-ico{animation:none}}
+
+/* clear Back button on every topic and part page, all screens (Irina, 2026-11-20) */
+.back-btn{display:inline-flex;align-items:center;gap:10px;min-height:44px;padding:10px 18px;margin:0 0 var(--s2);border:1.5px solid var(--black);background:var(--white);color:var(--black);font-family:var(--font-title);font-weight:700;font-size:12px;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;line-height:1.2}
+.back-btn .ar{font-size:22px;line-height:1;margin-top:-2px}
+.back-btn:hover{background:var(--black);color:var(--white)}
+.ch-hero .back-btn{background:transparent;color:var(--white);border-color:var(--white);margin-bottom:var(--s3)}
+.ch-hero .back-btn:hover{background:var(--white);color:var(--black)}
+.ch-hero .sec-hero-text .label{display:block}
+@media (max-width:600px){.back-btn{display:flex;width:100%;justify-content:center}}
